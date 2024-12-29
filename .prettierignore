@@ -1,0 +1,5 @@
+# Ignore artifacts:
+dist
+coverage
+tsconfig.json
+node_modules
