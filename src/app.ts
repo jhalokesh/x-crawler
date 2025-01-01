@@ -4,8 +4,12 @@ import { Config } from './config';
 
 const app = express();
 
-app.get('/', (req, res) => {
-    res.send('Web crawler is running...');
+app.use(express.json({ limit: '64kb' }));
+app.use(express.urlencoded({ extended: true, limit: '32kb' }));
+
+// * healthcheck
+app.get('/v1/health-check', (req, res) => {
+    res.status(200).json({ msg: 'Web crawler is running...' });
 });
 
 // global error handler
