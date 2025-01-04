@@ -19,3 +19,6 @@ export const REDIS_CONFIG = {
     host: String(REDIS_HOST),
     port: Number(REDIS_PORT),
 };
+
+// * Queue names
+export const validDomainQueueName = 'valid-domain-queue';
