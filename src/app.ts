@@ -12,12 +12,15 @@ app.get('/v1/health-check', (req, res) => {
     res.status(200).json({ msg: 'Web crawler is running...' });
 });
 
+import crawlerRouter from './routes/crawlerRoutes';
+
+app.use('/api/v1/crawl', crawlerRouter);
+
 // global error handler
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
     const NODE_ENV = Config.NODE_ENV;
     // TODO - implement logger
-    console.log(err.message);
     const statusCode = err.statusCode || err.status || 500;
 
     res.status(statusCode).json({
