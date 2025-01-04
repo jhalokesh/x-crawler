@@ -19,7 +19,7 @@ export class CrawlerController {
                 validDomains,
                 msg: 'Only these domains might be crawled',
             },
-            InvalidDomans: { invalidDomains, msg: 'These are invalid domains' },
+            unableToCrawl: { invalidDomains, msg: 'These are invalid domains' },
         });
     }
 }
