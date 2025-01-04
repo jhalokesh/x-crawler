@@ -49,6 +49,9 @@ describe('POST api/v1/crawl/static', () => {
             expect(response.body.crawlingOnDomains).toHaveProperty(
                 'validDomains'
             );
+            expect(
+                response.body.crawlingOnDomains.validDomains.length
+            ).toBeGreaterThan(0);
         });
         it('should return invalid domains in the response', async () => {
             const userInput = {
