@@ -10,6 +10,14 @@ export class DomainService {
         );
     }
 
+    async crawlDomainStatus(domainId: string) {
+        await StaticCrawlDomain.findByIdAndUpdate(domainId, {
+            $set: {
+                status: 'in-progress',
+            },
+        });
+    }
+
     async saveProductUrls(productUrls: string[], domainId: string) {
         const newProductUrlsEntry = new StaticCrawlProductUrl({
             domainId,

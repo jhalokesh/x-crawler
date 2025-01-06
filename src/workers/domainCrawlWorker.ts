@@ -5,21 +5,26 @@ export const domainCrawlJob = async (job: Job) => {
     const { domain, groupId } = job.data;
     try {
         // upsert domain with groupId in DB
-        const domainDoc = await domainService.upsertDomain(domain, groupId);
+        const crawlDomainDoc = await domainService.upsertDomain(
+            domain,
+            groupId
+        );
+        const domainId = crawlDomainDoc.id;
 
-        // Check if crawling is needed
-        if (domainDoc.jobId.length !== 1) {
-            /*
-             * If jobId[] length is not equal to or greater than 1,
-             * it means some other process is already crawling or has crawled this domain,
-             * so no need to crawl again,
-             * TTL is already added on Document to prevent long persisted domain crawled data
-             */
-            // TODO: implement logger - if required
+        // check if domain is crawling by other process or has been already crawled
+        if (
+            crawlDomainDoc.status === 'in-progress' ||
+            crawlDomainDoc.status === 'completed'
+        ) {
             console.log(`Domain ${domain} already processed. Skipping crawl.`);
-            return;
+            return; // no need to crawl
         }
-        // Proceed crawling
+
+        /**
+         * proceed crawling
+         * update domain-status to in-progress
+         */
+        await domainService.crawlDomainStatus(domainId);
         // const productUrls: string[] = await crawlService.crawl(domain);
         const productUrls = [
             'amazon.com',
@@ -29,13 +34,12 @@ export const domainCrawlJob = async (job: Job) => {
         ]; // this will come from crawler service
 
         // save productUrls with domainId in DB
-        const domainId = domainDoc.id;
         await domainService.saveProductUrls(productUrls, domainId);
 
         console.log(`crawling success for ${domain}`);
     } catch (error) {
         // TODO: implement logger
         // TODO: improve logic error handling
-        console.error(`Error process domain ${domain}`, error);
+        console.error(`Error processing domain ${domain}`, error);
     }
 };
