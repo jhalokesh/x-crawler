@@ -1,5 +1,4 @@
 import { Job } from 'bullmq';
-import { StaticCrawlDomain } from '../models/StaticCrawlDomain';
 import { domainService } from '../services/DomainService';
 
 export const domainCrawlJob = async (job: Job) => {

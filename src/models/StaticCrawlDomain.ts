@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { IDomainDocument } from '../types';
+import { CrawlDomainStatus, IDomainDocument } from '../types';
 
 const StaticCrawlDomainSchema = new mongoose.Schema<IDomainDocument>(
     {
@@ -11,6 +11,11 @@ const StaticCrawlDomainSchema = new mongoose.Schema<IDomainDocument>(
         jobId: {
             type: [String],
             default: [],
+        },
+        status: {
+            type: String,
+            enum: Object.values(CrawlDomainStatus),
+            default: CrawlDomainStatus.PENDING,
         },
         expiresAt: {
             type: Date,
