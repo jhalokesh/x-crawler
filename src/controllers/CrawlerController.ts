@@ -4,9 +4,12 @@ import { IRequestWithDomain } from '../types';
 import createHttpError from 'http-errors';
 import { validDomainQueue } from '../config/queue';
 import { validDomainQueueName } from '../config';
+import { QueueService } from '../services/QueueService';
 
 export class CrawlerController {
-    async staticDomainCrawler(req: IRequestWithDomain, res: Response, next: NextFunction) {
+    constructor(private queueService: QueueService) {}
+
+    async domainCrawl(req: IRequestWithDomain, res: Response, next: NextFunction) {
         const validDomains: string[] = req.validDomains || [];
         const invalidDomains: string[] = req.invalidDomains || [];
 
@@ -25,7 +28,7 @@ export class CrawlerController {
             },
         }));
 
-        await validDomainQueue.addBulk(jobs);
+        await this.queueService.addBulk(jobs);
 
         return res.json({
             jobId: validDomainsGroupId,

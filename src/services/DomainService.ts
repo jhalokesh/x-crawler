@@ -10,11 +10,9 @@ export class DomainService {
         );
     }
 
-    async crawlDomainStatus(domainId: string) {
+    async crawlDomainStatus(domainId: string, status: string) {
         await StaticCrawlDomain.findByIdAndUpdate(domainId, {
-            $set: {
-                status: 'in-progress',
-            },
+            $set: { status },
         });
     }
 

@@ -1,6 +1,7 @@
 import { Job } from 'bullmq';
 import { domainService } from '../services/DomainService';
 import { crawlerService } from '../services/CrawlerService';
+import { CrawlDomainStatus } from '../types';
 
 export const domainCrawlJob = async (job: Job) => {
     const { domain, groupId } = job.data;
@@ -19,11 +20,16 @@ export const domainCrawlJob = async (job: Job) => {
          * proceed crawling
          * update domain-status to in-progress
          */
-        await domainService.crawlDomainStatus(domainId);
-        const productUrls: string[] = await crawlerService.startCrawl(domain, 1);
+        await domainService.crawlDomainStatus(domainId, CrawlDomainStatus.IN_PROGRESS);
+        const productUrls: string[] = await crawlerService.startCrawl(domain, 0);
+        if (productUrls.length <= 0) {
+            console.log(`Something went wrong while crawling ${domain} or no product urls found!`);
+            return;
+        }
 
-        // save productUrls with domainId in DB
+        // save productUrls with domainId and update domain-status to completed
         await domainService.saveProductUrls(productUrls, domainId);
+        await domainService.crawlDomainStatus(domainId, CrawlDomainStatus.COMPLETED);
 
         console.log(`crawling success for ${domain}`);
     } catch (error) {
