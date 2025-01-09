@@ -1,5 +1,6 @@
 import { NextFunction, Response } from 'express';
 import createHttpError from 'http-errors';
+import { URL } from 'node:url';
 import { IRequestWithDomain } from '../types';
 import { Config } from '../config';
 
@@ -31,21 +32,28 @@ export const validateInputDomains = (
         return;
     }
 
-    // checking valid domains
-    const validDomainRegex =
-        /^(?!-)([a-zA-Z0-9-]{1,63}(?<!-)\.)+[a-zA-Z]{2,6}$/;
-
     let validDomains: string[] = [];
     let invalidDomains: string[] = [];
 
-    domains.forEach((domain: string) => {
-        const isValidDomain = validDomainRegex.test(domain);
-        if (isValidDomain) {
+    for (let domain of domains) {
+        domain = domain.toLowerCase().trim();
+
+        if (domain.startsWith('http')) {
+            const url = new URL(domain);
+            domain = url.hostname;
+        }
+        // checking valid domains
+        const validDomainRegex =
+            /^(?!-)([a-zA-Z0-9-]{1,63}(?<!-)\.)+[a-zA-Z]{2,6}$/;
+
+        if (validDomainRegex.test(domain)) {
             validDomains.push(domain);
-        } else {
+        }
+
+        if (!validDomainRegex.test(domain)) {
             invalidDomains.push(domain);
         }
-    });
+    }
 
     if (validDomains.length <= 0) {
         const err = createHttpError(400, 'Please input valid domains');

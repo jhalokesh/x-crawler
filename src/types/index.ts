@@ -22,6 +22,9 @@ export interface IProductUrlsDocument extends Document {
 }
 
 export interface IRequestWithDomain extends Request {
+    body: {
+        domains?: string[];
+    };
     validDomains?: string[];
     invalidDomains?: string[];
 }
