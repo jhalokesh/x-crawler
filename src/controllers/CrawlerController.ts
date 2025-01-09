@@ -17,12 +17,15 @@ export class CrawlerController {
 
         const validDomainsGroupId = uuidv4();
 
-        for (const domain of validDomains) {
-            await validDomainQueue.add('add valid domain to crawl', {
+        const jobs = validDomains.map((domain) => ({
+            name: 'add valid domain to crawl',
+            data: {
                 domain,
                 groupId: validDomainsGroupId,
-            });
-        }
+            },
+        }));
+
+        await validDomainQueue.addBulk(jobs);
 
         return res.json({
             jobId: validDomainsGroupId,
