@@ -3,7 +3,11 @@ import { domainService } from '../services/DomainService';
 import { crawlerService } from '../services/CrawlerService';
 import { CrawlDomainStatus } from '../types';
 
-export const domainCrawlJob = async (job: Job) => {
+// helper function to process worker
+const processDomainWorker = async (
+    job: Job,
+    crawlMethod: (domain: string, maxDepth: number) => Promise<string[]>
+) => {
     const { domain, groupId } = job.data;
     try {
         // upsert domain with groupId in DB
@@ -37,4 +41,14 @@ export const domainCrawlJob = async (job: Job) => {
         // TODO: improve logic error handling
         console.error(`Error processing domain ${domain}`, error);
     }
+};
+
+// for static crawler
+export const domainCrawlJob = async (job: Job) => {
+    await processDomainWorker(job, crawlerService.startCrawl);
+};
+
+// for dynamic crawler
+export const dynamicDomainCrawlJob = async (job: Job) => {
+    await processDomainWorker(job, crawlerService.startCrawlDynamic);
 };

@@ -24,3 +24,4 @@ export const REDIS_CONFIG = {
 
 // * Queue names
 export const validDomainQueueName = 'valid-domain-queue';
+export const dynamicValidDomainQueueName = 'dynamic-valid-domain-queue';

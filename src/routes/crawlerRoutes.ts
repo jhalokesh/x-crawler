@@ -1,12 +1,13 @@
-import { NextFunction, Request, Response, Router } from 'express';
+import { NextFunction, Response, Router } from 'express';
+import { dynamicValidDomainQueue, validDomainQueue } from '../config/queue';
 import { CrawlerController } from '../controllers/CrawlerController';
 import { validateInputDomains } from '../middlewares/validateInput';
-import { IRequestWithDomain } from '../types';
 import { QueueService } from '../services/QueueService';
-import { validDomainQueue } from '../config/queue';
+import { IRequestWithDomain } from '../types';
 
 const router = Router();
 
+//for static crawler
 const queueService = new QueueService(validDomainQueue);
 const crawlerController = new CrawlerController(queueService);
 
@@ -20,7 +21,18 @@ router
         }
     );
 
-// TODO: dynamic crawling using headless browser or js engine
-router.post('/dynamic');
+// for dynamic crawler
+const dynamicQueueService = new QueueService(dynamicValidDomainQueue);
+const dynamicCrawlerController = new CrawlerController(dynamicQueueService);
+
+// dynamic crawling using headless browser
+router
+    .route('/dynamic')
+    .post(
+        validateInputDomains,
+        async (req: IRequestWithDomain, res: Response, next: NextFunction) => {
+            await dynamicCrawlerController.domainCrawl(req, res, next);
+        }
+    );
 
 export default router;

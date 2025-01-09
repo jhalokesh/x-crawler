@@ -120,6 +120,22 @@ export class CrawlerService {
 
         return Array.from(productUrls); // return unique product urls as an array
     }
+
+    async startCrawlDynamic(domain: string, maxDepth?: number): Promise<string[]> {
+        const seedUrl = url.format({
+            protocol: 'https',
+            hostname: domain,
+            pathname: '/',
+        });
+
+        const visitedUrls = new Set<string>(); // Track visited urls
+        const visitUrlsQueue: { url: string; depth: number }[] = [{ url: seedUrl, depth: 0 }]; // BFS queue
+        const productUrls = new Set<string>(); // store only unique product urls
+
+        // TODO: implement dynamic crawling using headless browser - puppeteer
+
+        return Array.from(productUrls); // return unique product urls as an array
+    }
 }
 
 export const crawlerService = new CrawlerService();
