@@ -1,5 +1,6 @@
 import { Job } from 'bullmq';
 import { domainService } from '../services/DomainService';
+import { crawlerService } from '../services/CrawlerService';
 
 export const domainCrawlJob = async (job: Job) => {
     const { domain, groupId } = job.data;
@@ -25,13 +26,10 @@ export const domainCrawlJob = async (job: Job) => {
          * update domain-status to in-progress
          */
         await domainService.crawlDomainStatus(domainId);
-        // const productUrls: string[] = await crawlService.crawl(domain);
-        const productUrls = [
-            'amazon.com',
-            'flipkart.in',
-            'shop.myntra.com',
-            'store.ebay.co.uk',
-        ]; // this will come from crawler service
+        const productUrls: string[] = await crawlerService.startCrawl(
+            domain,
+            1
+        );
 
         // save productUrls with domainId in DB
         await domainService.saveProductUrls(productUrls, domainId);

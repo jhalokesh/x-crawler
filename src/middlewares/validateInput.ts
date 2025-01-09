@@ -35,6 +35,7 @@ export const validateInputDomains = (
     let validDomains: string[] = [];
     let invalidDomains: string[] = [];
 
+    // filter valid and invalid domains
     for (let domain of domains) {
         domain = domain.toLowerCase().trim();
 
