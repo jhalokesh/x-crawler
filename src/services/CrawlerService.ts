@@ -6,11 +6,9 @@ export class CrawlerService {
     // Regex to match non-HTML file extensions; TODO: improve regex or improve logic to avoid unnecessary crawling
     private static NON_HTML_EXTENSIONS =
         /\.(pdf|zip|jpg|jpeg|png|gif|mp4|mp3|exe|docx|xlsx|pptx)$/i;
+
     // helper function to convert relative urls to absolute urls
-    private static getAbsoluteUrl(
-        baseUrl: string,
-        relativeUrl: string
-    ): string {
+    private static getAbsoluteUrl(baseUrl: string, relativeUrl: string): string {
         return new URL(relativeUrl, baseUrl).href;
     }
 
@@ -22,10 +20,7 @@ export class CrawlerService {
             return parsedDomain === parsedTagetUrlDomain;
         } catch (error) {
             // TODO: implement logger
-            console.log(
-                `Error while checking if url belongs to seed url`,
-                error
-            );
+            console.log(`Error while checking if url belongs to seed url`, error);
             return false;
         }
     }
@@ -41,9 +36,7 @@ export class CrawlerService {
         });
 
         const visitedUrls = new Set<string>(); // Track visited urls
-        const visitUrlsQueue: { url: string; depth: number }[] = [
-            { url: seedUrl, depth: 0 },
-        ]; // BFS queue
+        const visitUrlsQueue: { url: string; depth: number }[] = [{ url: seedUrl, depth: 0 }]; // BFS queue
         const productUrls = new Set<string>(); // store only unique product urls
 
         while (visitUrlsQueue.length > 0) {
@@ -57,9 +50,7 @@ export class CrawlerService {
 
             // skip it if already visited
             if (visitedUrls.has(currentUrl)) {
-                console.log(
-                    `skip:: already visited: ${visitedUrls.has(currentUrl)}`
-                );
+                console.log(`skip:: already visited: ${visitedUrls.has(currentUrl)}`);
                 continue;
             }
 
@@ -98,14 +89,10 @@ export class CrawlerService {
                     }
 
                     // convert relative urls to absolute urls
-                    const absoluteUrl = CrawlerService.getAbsoluteUrl(
-                        currentUrl,
-                        href
-                    );
+                    const absoluteUrl = CrawlerService.getAbsoluteUrl(currentUrl, href);
 
                     // skip if url is not from same domain
-                    if (!CrawlerService.isSameDomain(seedUrl, absoluteUrl))
-                        continue;
+                    if (!CrawlerService.isSameDomain(seedUrl, absoluteUrl)) continue;
 
                     // skip already visited urls
                     if (absoluteUrl && visitedUrls.has(absoluteUrl)) continue;

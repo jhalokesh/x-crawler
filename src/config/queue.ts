@@ -10,8 +10,4 @@ const connection = new Redis({
 
 export const validDomainQueue = new Queue(validDomainQueueName, { connection });
 
-export const validDomainWorker = new Worker(
-    validDomainQueueName,
-    domainCrawlJob,
-    { connection }
-);
+export const validDomainWorker = new Worker(validDomainQueueName, domainCrawlJob, { connection });

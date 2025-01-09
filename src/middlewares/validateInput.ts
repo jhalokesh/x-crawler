@@ -13,10 +13,7 @@ export const validateInputDomains = (
 
     // validate input
     if (!domains || !Array.isArray(domains)) {
-        const err = createHttpError(
-            400,
-            'Invalid input. Domains must be an array of strings.'
-        );
+        const err = createHttpError(400, 'Invalid input. Domains must be an array of strings.');
         next(err);
         return;
     }
@@ -44,8 +41,7 @@ export const validateInputDomains = (
             domain = url.hostname;
         }
         // checking valid domains
-        const validDomainRegex =
-            /^(?!-)([a-zA-Z0-9-]{1,63}(?<!-)\.)+[a-zA-Z]{2,6}$/;
+        const validDomainRegex = /^(?!-)([a-zA-Z0-9-]{1,63}(?<!-)\.)+[a-zA-Z]{2,6}$/;
 
         if (validDomainRegex.test(domain)) {
             validDomains.push(domain);

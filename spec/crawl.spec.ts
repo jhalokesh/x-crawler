@@ -20,9 +20,7 @@ describe('POST api/v1/crawl/static', () => {
                 ],
             };
 
-            const response = await request(app)
-                .post('/api/v1/crawl/static')
-                .send(userInput);
+            const response = await request(app).post('/api/v1/crawl/static').send(userInput);
 
             expect(response.statusCode).toBe(200);
         });
@@ -41,17 +39,11 @@ describe('POST api/v1/crawl/static', () => {
                 ],
             };
 
-            const response = await request(app)
-                .post('/api/v1/crawl/static')
-                .send(userInput);
+            const response = await request(app).post('/api/v1/crawl/static').send(userInput);
 
             expect(response.body).toHaveProperty('crawlingOnDomains');
-            expect(response.body.crawlingOnDomains).toHaveProperty(
-                'validDomains'
-            );
-            expect(
-                response.body.crawlingOnDomains.validDomains.length
-            ).toBeGreaterThan(0);
+            expect(response.body.crawlingOnDomains).toHaveProperty('validDomains');
+            expect(response.body.crawlingOnDomains.validDomains.length).toBeGreaterThan(0);
         });
         it('should return invalid domains in the response', async () => {
             const userInput = {
@@ -68,14 +60,10 @@ describe('POST api/v1/crawl/static', () => {
                 ],
             };
 
-            const response = await request(app)
-                .post('/api/v1/crawl/static')
-                .send(userInput);
+            const response = await request(app).post('/api/v1/crawl/static').send(userInput);
 
             expect(response.body).toHaveProperty('unableToCrawl');
-            expect(response.body.unableToCrawl).toHaveProperty(
-                'invalidDomains'
-            );
+            expect(response.body.unableToCrawl).toHaveProperty('invalidDomains');
         });
         it('should generate a unique job ID and validate uuidV4', async () => {
             const userInput = {
@@ -92,9 +80,7 @@ describe('POST api/v1/crawl/static', () => {
                 ],
             };
 
-            const response = await request(app)
-                .post('/api/v1/crawl/static')
-                .send(userInput);
+            const response = await request(app).post('/api/v1/crawl/static').send(userInput);
 
             function uuidValidateV4(uuid: string) {
                 return uuidValidate(uuid) && uuidVersion(uuid) === 4;
@@ -112,9 +98,7 @@ describe('POST api/v1/crawl/static', () => {
             const userInput = { domains: [] };
             const errorMsg = 'Please input valid domains';
 
-            const response = await request(app)
-                .post('/api/v1/crawl/static')
-                .send(userInput);
+            const response = await request(app).post('/api/v1/crawl/static').send(userInput);
 
             expect(response.body).toHaveProperty('errors');
             expect(response.body.errors.length).toBeGreaterThan(0);
@@ -124,12 +108,9 @@ describe('POST api/v1/crawl/static', () => {
         });
         it('should handle non-array domain input and return 400 status code and appropriate error messages', async () => {
             const userInput = {};
-            const errorMsg =
-                'Invalid input. Domains must be an array of strings.';
+            const errorMsg = 'Invalid input. Domains must be an array of strings.';
 
-            const response = await request(app)
-                .post('/api/v1/crawl/static')
-                .send(userInput);
+            const response = await request(app).post('/api/v1/crawl/static').send(userInput);
 
             expect(response.body).toHaveProperty('errors');
             expect(response.body.errors.length).toBeGreaterThan(0);
@@ -171,9 +152,7 @@ describe('POST api/v1/crawl/static', () => {
             };
             const errorMsg = `Max ${Config.REQUEST_DOMAIN_COUNT} domains are allowed as input`;
 
-            const response = await request(app)
-                .post('/api/v1/crawl/static')
-                .send(userInput);
+            const response = await request(app).post('/api/v1/crawl/static').send(userInput);
 
             expect(response.body).toHaveProperty('errors');
             expect(response.body.errors.length).toBeGreaterThan(0);

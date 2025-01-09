@@ -6,19 +6,12 @@ import { validDomainQueue } from '../config/queue';
 import { validDomainQueueName } from '../config';
 
 export class CrawlerController {
-    async staticDomainCrawler(
-        req: IRequestWithDomain,
-        res: Response,
-        next: NextFunction
-    ) {
+    async staticDomainCrawler(req: IRequestWithDomain, res: Response, next: NextFunction) {
         const validDomains: string[] = req.validDomains || [];
         const invalidDomains: string[] = req.invalidDomains || [];
 
         if (validDomains.length <= 0) {
-            const err = createHttpError(
-                500,
-                'Internal server error | No valid domains list found'
-            );
+            const err = createHttpError(500, 'Internal server error | No valid domains list found');
             next(err);
         }
 

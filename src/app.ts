@@ -29,10 +29,7 @@ app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
                 type: err.name,
                 msg: err.message,
                 path: '',
-                location:
-                    NODE_ENV === 'development' || NODE_ENV === 'test'
-                        ? err.stack
-                        : '',
+                location: NODE_ENV === 'development' || NODE_ENV === 'test' ? err.stack : '',
             },
         ],
     });

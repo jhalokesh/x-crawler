@@ -7,9 +7,7 @@ const DB_NAME = Config.DB_NAME;
 
 const connectDB = async () => {
     try {
-        const connectionInstance = await mongoose.connect(
-            `${MONGODB_URI}/${DB_NAME}`
-        );
+        const connectionInstance = await mongoose.connect(`${MONGODB_URI}/${DB_NAME}`);
         dbInstance = connectionInstance;
         // TODO: Implement logger
         console.log(

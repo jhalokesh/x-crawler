@@ -6,17 +6,11 @@ export const domainCrawlJob = async (job: Job) => {
     const { domain, groupId } = job.data;
     try {
         // upsert domain with groupId in DB
-        const crawlDomainDoc = await domainService.upsertDomain(
-            domain,
-            groupId
-        );
+        const crawlDomainDoc = await domainService.upsertDomain(domain, groupId);
         const domainId = crawlDomainDoc.id;
 
         // check if domain is crawling by other process or has been already crawled
-        if (
-            crawlDomainDoc.status === 'in-progress' ||
-            crawlDomainDoc.status === 'completed'
-        ) {
+        if (crawlDomainDoc.status === 'in-progress' || crawlDomainDoc.status === 'completed') {
             console.log(`Domain ${domain} already processed. Skipping crawl.`);
             return; // no need to crawl
         }
@@ -26,10 +20,7 @@ export const domainCrawlJob = async (job: Job) => {
          * update domain-status to in-progress
          */
         await domainService.crawlDomainStatus(domainId);
-        const productUrls: string[] = await crawlerService.startCrawl(
-            domain,
-            1
-        );
+        const productUrls: string[] = await crawlerService.startCrawl(domain, 1);
 
         // save productUrls with domainId in DB
         await domainService.saveProductUrls(productUrls, domainId);
