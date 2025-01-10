@@ -1,6 +1,6 @@
-import url, { URL } from 'node:url';
 import axios from 'axios';
 import { JSDOM } from 'jsdom';
+import url, { URL } from 'node:url';
 
 export class CrawlerService {
     // Regex to match non-HTML file extensions; TODO: improve regex or improve logic to avoid unnecessary crawling
