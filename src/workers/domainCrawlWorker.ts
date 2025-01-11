@@ -4,6 +4,7 @@ import { dynamicDomainService, staticDomainService } from '../db/modelInstance';
 import { crawlerService } from '../services/CrawlerService';
 import { DomainService } from '../services/DomainService';
 import { CrawlDomainStatus, IDomainDocument, IProductUrlsDocument } from '../types';
+import { maxDepthAllowedForCrawlling } from '../config';
 
 // helper function to process worker
 const processDomainWorker = async (
@@ -28,7 +29,10 @@ const processDomainWorker = async (
          * update domain-status to in-progress
          */
         await domainServiceInstance.crawlDomainStatus(domainId, CrawlDomainStatus.IN_PROGRESS);
-        const productUrls: string[] = await crawlMethod(domain, 1);
+        const productUrls: string[] = await crawlMethod(
+            domain,
+            maxDepthAllowedForCrawlling.maxDepth
+        );
         if (productUrls.length <= 0) {
             console.log(`Something went wrong while crawling ${domain} or no product urls found!`);
             return;

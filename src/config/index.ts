@@ -31,3 +31,7 @@ export const scrollOptionsInDynamicCrawling = {
     maxScrolls: 5, // max number of scrolls
     scrollDelay: 1000, // delay between scrolls in 'ms'
 };
+
+export const maxDepthAllowedForCrawlling = {
+    maxDepth: 1,
+};
