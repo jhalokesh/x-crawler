@@ -1,8 +1,8 @@
 import { NextFunction, Response } from 'express';
 import createHttpError from 'http-errors';
 import { URL } from 'node:url';
-import { IRequestWithDomain } from '../types';
 import { Config } from '../config';
+import { IRequestWithDomain } from '../types';
 
 export const validateInputDomains = (
     req: IRequestWithDomain,

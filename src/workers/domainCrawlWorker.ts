@@ -1,10 +1,11 @@
 import { Job } from 'bullmq';
 
+import { maxDepthAllowedForCrawlling } from '../config';
 import { dynamicDomainService, staticDomainService } from '../db/modelInstance';
 import { crawlerService } from '../services/CrawlerService';
 import { DomainService } from '../services/DomainService';
 import { CrawlDomainStatus, IDomainDocument, IProductUrlsDocument } from '../types';
-import { maxDepthAllowedForCrawlling } from '../config';
+import { getProductUrls } from '../utils/getProductUrls';
 
 // helper function to process worker
 const processDomainWorker = async (
@@ -34,12 +35,17 @@ const processDomainWorker = async (
             maxDepthAllowedForCrawlling.maxDepth
         );
         if (foundUrlsAfterCrawling.length <= 0) {
-            console.log(`Something went wrong while crawling ${domain} or no product urls found!`);
+            console.log(`Something went wrong while crawling ${domain} or no urls found!`);
             return;
         }
 
         // TODO: implement logic to get only product urls;
-        const productUrls = foundUrlsAfterCrawling;
+        const productUrls: string[] = await getProductUrls(foundUrlsAfterCrawling);
+
+        if (productUrls.length <= 0) {
+            console.log(`Something went wrong or no product urls found on ${domain}`);
+            return;
+        }
 
         // save productUrls with domainId and update domain-status to completed
         await domainServiceInstance.saveProductUrls(productUrls, domainId);
