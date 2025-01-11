@@ -192,7 +192,6 @@ export class CrawlerService {
                     // Add valid URLs to queue
                     for (const href of hrefs) {
                         console.log(`working on ${href}`);
-                        hrefs.shift();
                         // skip if href is not valid or points to non-HTML resource
                         if (
                             !href ||
