@@ -49,7 +49,7 @@ export class CrawlerService {
 
         const visitedUrls = new Set<string>(); // Track visited urls
         const visitUrlsQueue: { url: string; depth: number }[] = [{ url: seedUrl, depth: 0 }]; // BFS queue
-        const productUrls = new Set<string>(); // store only unique product urls
+        const foundUrlsSet = new Set<string>(); // store only unique product urls
 
         while (visitUrlsQueue.length > 0) {
             const delayInMS = Math.round((Math.random() + 1) * 10000);
@@ -71,7 +71,7 @@ export class CrawlerService {
                 console.log(
                     `skip:: Max Depth reached:: Max depth: ${maxDepth} :: Depth: ${depth})}`
                 );
-                return Array.from(productUrls);
+                return Array.from(foundUrlsSet);
             }
 
             try {
@@ -109,7 +109,7 @@ export class CrawlerService {
                     // skip already visited urls
                     if (absoluteUrl && visitedUrls.has(absoluteUrl)) continue;
 
-                    productUrls.add(absoluteUrl);
+                    foundUrlsSet.add(absoluteUrl);
 
                     const urlExistsInQueue = visitUrlsQueue.some(
                         (urlObj) => urlObj.url === absoluteUrl
@@ -130,7 +130,7 @@ export class CrawlerService {
             await new Promise((resolve) => setTimeout(resolve, delayInMS));
         }
 
-        return Array.from(productUrls); // return unique product urls as an array
+        return Array.from(foundUrlsSet); // return unique product urls as an array
     }
 
     async startCrawlDynamic(domain: string, maxDepth?: number): Promise<string[]> {
@@ -142,7 +142,7 @@ export class CrawlerService {
 
         const visitedUrls = new Set<string>(); // Track visited urls
         const visitUrlsQueue: { url: string; depth: number }[] = [{ url: seedUrl, depth: 0 }]; // BFS queue
-        const productUrls = new Set<string>(); // store only unique product urls
+        const foundUrlsSet = new Set<string>(); // store only unique product urls
 
         // launch browser
         const browserInstance = await puppeteer.launch({ headless: false });
@@ -212,7 +212,7 @@ export class CrawlerService {
                         // skip already visited urls
                         if (absoluteUrl && visitedUrls.has(absoluteUrl)) continue;
 
-                        productUrls.add(absoluteUrl);
+                        foundUrlsSet.add(absoluteUrl);
 
                         const urlExistsInQueue = visitUrlsQueue.some(
                             (urlObj) => urlObj.url === absoluteUrl
@@ -252,7 +252,7 @@ export class CrawlerService {
         }
         // close browser
         await browserInstance.close();
-        return Array.from(productUrls); // return unique product urls as an array
+        return Array.from(foundUrlsSet); // return unique urls as an array
     }
 }
 

@@ -29,14 +29,17 @@ const processDomainWorker = async (
          * update domain-status to in-progress
          */
         await domainServiceInstance.crawlDomainStatus(domainId, CrawlDomainStatus.IN_PROGRESS);
-        const productUrls: string[] = await crawlMethod(
+        const foundUrlsAfterCrawling: string[] = await crawlMethod(
             domain,
             maxDepthAllowedForCrawlling.maxDepth
         );
-        if (productUrls.length <= 0) {
+        if (foundUrlsAfterCrawling.length <= 0) {
             console.log(`Something went wrong while crawling ${domain} or no product urls found!`);
             return;
         }
+
+        // TODO: implement logic to get only product urls;
+        const productUrls = foundUrlsAfterCrawling;
 
         // save productUrls with domainId and update domain-status to completed
         await domainServiceInstance.saveProductUrls(productUrls, domainId);
