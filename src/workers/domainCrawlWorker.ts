@@ -28,7 +28,7 @@ const processDomainWorker = async (
          * update domain-status to in-progress
          */
         await domainServiceInstance.crawlDomainStatus(domainId, CrawlDomainStatus.IN_PROGRESS);
-        const productUrls: string[] = await crawlMethod(domain, 0);
+        const productUrls: string[] = await crawlMethod(domain, 1);
         if (productUrls.length <= 0) {
             console.log(`Something went wrong while crawling ${domain} or no product urls found!`);
             return;

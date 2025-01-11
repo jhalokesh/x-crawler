@@ -25,3 +25,9 @@ export const REDIS_CONFIG = {
 // * Queue names
 export const validDomainQueueName = 'valid-domain-queue';
 export const dynamicValidDomainQueueName = 'dynamic-valid-domain-queue';
+
+// * Crawler configurations CONSTANTS
+export const scrollOptionsInDynamicCrawling = {
+    maxScrolls: 5, // max number of scrolls
+    scrollDelay: 1000, // delay between scrolls in 'ms'
+};

@@ -1,6 +1,8 @@
 import axios from 'axios';
 import { JSDOM } from 'jsdom';
 import url, { URL } from 'node:url';
+import puppeteer, { Page } from 'puppeteer';
+import { scrollOptionsInDynamicCrawling } from '../config';
 
 export class CrawlerService {
     // Regex to match non-HTML file extensions; TODO: improve regex or improve logic to avoid unnecessary crawling
@@ -16,7 +18,17 @@ export class CrawlerService {
     private static isSameDomain(domain: string, targetUrl: string) {
         try {
             let parsedDomain = new URL(domain).hostname;
-            const parsedTagetUrlDomain = new URL(targetUrl).hostname;
+
+            if (parsedDomain.includes('www.')) {
+                parsedDomain = parsedDomain.replace('www.', '');
+            }
+
+            let parsedTagetUrlDomain = new URL(targetUrl).hostname;
+
+            if (parsedTagetUrlDomain.includes('www.')) {
+                parsedTagetUrlDomain = parsedTagetUrlDomain.replace('www.', '');
+            }
+
             return parsedDomain === parsedTagetUrlDomain;
         } catch (error) {
             // TODO: implement logger
@@ -132,8 +144,115 @@ export class CrawlerService {
         const visitUrlsQueue: { url: string; depth: number }[] = [{ url: seedUrl, depth: 0 }]; // BFS queue
         const productUrls = new Set<string>(); // store only unique product urls
 
-        // TODO: implement dynamic crawling using headless browser - puppeteer
+        // launch browser
+        const browserInstance = await puppeteer.launch({ headless: false });
+        const page = await browserInstance.newPage();
 
+        while (visitUrlsQueue.length > 0) {
+            const delayInMS = Math.round((Math.random() + 1) * 10000);
+            const { maxScrolls, scrollDelay } = scrollOptionsInDynamicCrawling;
+
+            const { url: currentUrl, depth } = visitUrlsQueue.shift()!; // Dequeue the next URL
+
+            console.log(`crawling: ${currentUrl}, depth: ${depth}`);
+
+            console.log(`next request in ${delayInMS / 1000} seconds`);
+
+            // skip it if already visited
+            if (visitedUrls.has(currentUrl)) {
+                console.log(`skip:: already visited: ${visitedUrls.has(currentUrl)}`);
+                continue;
+            }
+
+            // skip if max depth provided and max depth reached
+            if (maxDepth !== undefined && depth >= maxDepth) {
+                console.log(
+                    `skip:: Max Depth reached:: Max depth: ${maxDepth} :: Depth: ${depth})}`
+                );
+                break;
+            }
+
+            try {
+                // navigate to the current url
+                await page.goto(currentUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
+                visitedUrls.add(currentUrl);
+
+                // scroll to the bottom of the page to trigger infinite scrolling
+                let scrollCount = 0;
+                let previousHeight = await page.evaluate('document.body.scrollHeight');
+
+                while (scrollCount <= maxScrolls) {
+                    console.log(`Scroll attempt ${scrollCount + 1} of ${maxScrolls}`);
+
+                    // extract all anchor href links on the webpage
+                    const hrefs = await page.evaluate(() =>
+                        Array.from(document.querySelectorAll('a'), (a) => a.href)
+                    );
+
+                    // Add valid URLs to queue
+                    for (const href of hrefs) {
+                        console.log(`working on ${href}`);
+                        hrefs.shift();
+                        // skip if href is not valid or points to non-HTML resource
+                        if (
+                            !href ||
+                            href.includes('#') ||
+                            href.includes('mailto:') ||
+                            href.includes('tel:') ||
+                            CrawlerService.NON_HTML_EXTENSIONS.test(href)
+                        ) {
+                            continue;
+                        }
+
+                        // convert relative urls to absolute urls
+                        const absoluteUrl = CrawlerService.getAbsoluteUrl(currentUrl, href);
+
+                        // skip if url is not from same domain
+                        if (!CrawlerService.isSameDomain(seedUrl, absoluteUrl)) continue;
+
+                        // skip already visited urls
+                        if (absoluteUrl && visitedUrls.has(absoluteUrl)) continue;
+
+                        productUrls.add(absoluteUrl);
+
+                        const urlExistsInQueue = visitUrlsQueue.some(
+                            (urlObj) => urlObj.url === absoluteUrl
+                        );
+
+                        // push in queue only if not visited and not in queue
+                        if (!visitedUrls.has(absoluteUrl) && !urlExistsInQueue) {
+                            visitUrlsQueue.push({
+                                url: absoluteUrl,
+                                depth: depth + 1,
+                            });
+                        }
+                    }
+
+                    // scroll to the bottom of the page
+                    await page.evaluate(() => window.scrollBy(0, document.body.scrollHeight));
+
+                    // Delay to allow new content to load
+                    await new Promise((resolve) => setTimeout(resolve, scrollDelay));
+
+                    const newHeight = await page.evaluate('document.body.scrollHeight');
+
+                    if (newHeight === previousHeight) {
+                        console.log(`No further scrolling possible. Exiting.`);
+                        break;
+                    }
+
+                    previousHeight = newHeight;
+                    scrollCount++;
+                }
+            } catch (error) {
+                console.log(`Error crawling ${currentUrl}: `, error);
+            }
+
+            // add a delay between requests
+            await new Promise((resolve) => setTimeout(resolve, delayInMS));
+        }
+        // close browser
+        await browserInstance.close();
         return Array.from(productUrls); // return unique product urls as an array
     }
 }
