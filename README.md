@@ -155,12 +155,12 @@ x-crawler/
 
 ## Detailed Blog
 
-For detail,refer to my [Blog](api_docs_link_here).
+For detail,refer to my [Blog](https://hashnode.com/post/cm5thqrm9000i09mtfforbtii).
 
 ## Diagrams
 
 1. **System Design Diagram**
-   ![System Design Diagram](images/system_design.png)
+   Check all design here [System Design Diagram](https://app.eraser.io/workspace/mlarp97YXAplzoovce6d?origin=share)
 
 2. **ER Diagram**
    ![ER Diagram](public/readme/images/er_digram.svg)
